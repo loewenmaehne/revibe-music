@@ -250,8 +250,11 @@ wss.on("connection", (ws, req) => {
   ws.on("close", () => {
     console.log("Client disconnected");
     clients.delete(ws);
-    if (ws.roomId && rooms.has(ws.roomId)) {
-        rooms.get(ws.roomId).removeClient(ws);
+    // Robust cleanup on close as well
+    for (const [id, room] of rooms.entries()) {
+        if (room.clients.has(ws)) {
+            room.removeClient(ws);
+        }
     }
   });
 });
